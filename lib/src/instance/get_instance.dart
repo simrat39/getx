@@ -169,8 +169,10 @@ class GetInstance {
 
       return _singl[key].getDependency() as S;
     } else {
-      if (!_factory.containsKey(key))
-        throw " $S not found. You need call put<$S>($S()) before";
+      if (!_factory.containsKey(key)) {
+        print(" $S not found. You need call put<$S>($S()) before");
+        return null;
+      }
 
       GetConfig.log('[GETX] $S instance was created at that time');
       S _value = put<S>(_factory[key].builder() as S);
