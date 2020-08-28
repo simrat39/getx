@@ -2,6 +2,7 @@ import 'package:get/src/core/log.dart';
 import 'package:get/src/navigation/root/smart_management.dart';
 import 'package:get/src/state_manager/rx/rx_interface.dart';
 import 'package:get/src/utils/queue/get_queue.dart';
+import 'package:flutter/foundation.dart';
 
 class GetConfig {
   static SmartManagement smartManagement = SmartManagement.full;
@@ -170,7 +171,7 @@ class GetInstance {
       return _singl[key].getDependency() as S;
     } else {
       if (!_factory.containsKey(key)) {
-        print(" $S not found. You need call put<$S>($S()) before");
+        GetConfig.log(" $S not found. You need call put<$S>($S()) before");
         return null;
       }
 
