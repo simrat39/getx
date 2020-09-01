@@ -1,6 +1,6 @@
 import 'package:get/src/core/log.dart';
 import 'package:get/src/navigation/root/smart_management.dart';
-import 'package:get/src/state_manager/rx/rx_interface.dart';
+import 'package:get/src/state_manager/rx/rx_core/rx_interface.dart';
 import 'package:get/src/utils/queue/get_queue.dart';
 import 'package:flutter/foundation.dart';
 
@@ -13,27 +13,54 @@ class GetConfig {
 
 class GetInstance {
   factory GetInstance() => _getInstance ??= GetInstance._();
+
   const GetInstance._();
+
   static GetInstance _getInstance;
 
   /// Holds references to every registered Instance when using
-  /// Get.[put]
-  static Map<String, _FcBuilder> _singl = {};
+  /// [Get.put()]
+  static Map<String, _InstanceBuilderFactory> _singl = {};
 
   /// Holds a reference to every registered callback when using
-  /// Get.[lazyPut]
+  /// [Get.lazyPut()]
   static Map<String, _Lazy> _factory = {};
 
+  /// Holds a reference to [GetConfig.currentRoute] when the Instance was
+  /// created to manage the memory.
   static Map<String, String> _routesKey = {};
 
   static GetQueue _queue = GetQueue();
 
-  void lazyPut<S>(FcBuilderFunc builder, {String tag, bool fenix = false}) {
+  /// Creates a new Instance<S> lazily from the [<S>builder()] callback.
+  ///
+  /// The first time you call [Get.find()], the [builder()] callback will create
+  /// the Instance and persisted as a Singleton (like you would use [Get.put()]).
+  ///
+  /// Using [GetConfig.smartManagement] as [SmartManagement.keepFactory] has the same outcome
+  /// as using [fenix:true] :
+  /// The internal register of [builder()] will remain in memory to recreate the Instance
+  /// if the Instance has been removed with [Get.delete()].
+  /// Therefore, future calls to [Get.find()] will return the same Instance.
+  ///
+  /// If you need to make use of GetxController's life-cycle ([onInit(), onStart(), onClose()])
+  /// [fenix] is a great choice to mix with [GetBuilder()] and [GetX()] widgets, and/or [GetMaterialApp] Navigation.
+  ///
+  /// You could use [Get.lazyPut(fenix:true)] in your app's [main()] instead of [Bindings()] for each [GetPage].
+  /// And the memory management will be similar.
+  ///
+  /// Subsequent calls to [Get.lazyPut()] with the same parameters (<[S]> and optionally [tag]
+  /// will **not** override the original).
+  void lazyPut<S>(InstanceBuilderCallback<S> builder,
+      {String tag, bool fenix = false}) {
     String key = _getKey(S, tag);
     _factory.putIfAbsent(key, () => _Lazy(builder, fenix));
   }
 
-  Future<S> putAsync<S>(FcBuilderFuncAsync<S> builder,
+  /// async version of [Get.put()].
+  /// Awaits for the resolution of the Future from [builder()] parameter and
+  /// stores the Instance returned.
+  Future<S> putAsync<S>(AsyncInstanceBuilderCallback<S> builder,
       {String tag, bool permanent = false}) async {
     return put<S>(await builder(), tag: tag, permanent: permanent);
   }
@@ -50,7 +77,7 @@ class GetInstance {
     S dependency, {
     String tag,
     bool permanent = false,
-    FcBuilderFunc<S> builder,
+    InstanceBuilderCallback<S> builder,
   }) {
     _insert(
         isSingleton: true,
@@ -71,7 +98,7 @@ class GetInstance {
   /// Repl b = find();
   /// print(a==b); (false)```
   void create<S>(
-    FcBuilderFunc<S> builder, {
+    InstanceBuilderCallback<S> builder, {
     String name,
     bool permanent = true,
   }) {
@@ -84,12 +111,14 @@ class GetInstance {
     bool isSingleton,
     String name,
     bool permanent = false,
-    FcBuilderFunc<S> builder,
+    InstanceBuilderCallback<S> builder,
   }) {
     assert(builder != null);
     final key = _getKey(S, name);
     _singl.putIfAbsent(
-        key, () => _FcBuilder<S>(isSingleton, builder, permanent, false));
+        key,
+        () =>
+            _InstanceBuilderFactory<S>(isSingleton, builder, permanent, false));
   }
 
   /// Clears from memory registered Instances associated with [routeName] when
@@ -147,8 +176,10 @@ class GetInstance {
     final key = _getKey(S, tag);
     final i = _singl[key].getDependency();
     if (i is DisposableInterface) {
-      i.onStart();
-      GetConfig.log('"$key" has been initialized');
+      if (i.onStart != null) {
+        i.onStart();
+        GetConfig.log('"$key" has been initialized');
+      }
     }
   }
 
@@ -181,8 +212,7 @@ class GetInstance {
   S find<S>({String tag}) {
     String key = _getKey(S, tag);
     if (isRegistered<S>(tag: tag)) {
-      _FcBuilder builder = _singl[key] as _FcBuilder;
-      if (builder == null) {
+      if (_singl[key] == null) {
         if (tag == null) {
           throw 'Class "$S" is not register';
         } else {
@@ -190,16 +220,15 @@ class GetInstance {
         }
       }
       _initDependencies<S>(name: tag);
-
       return _singl[key].getDependency() as S;
     } else {
       if (!_factory.containsKey(key)) {
-        GetConfig.log(" $S not found. You need call put<$S>($S()) before");
+        GetConfig.log(
+            " $S not found. You need call put<$S>($S()) or Get.lazyPut(()=>$S())");
         return null;
       }
 
-      // TODO: This message is not clear
-      GetConfig.log('"$S" instance was created at that time');
+      GetConfig.log('Lazy instance "$S" created');
 
       S _value = put<S>(_factory[key].builder() as S);
 
@@ -214,6 +243,8 @@ class GetInstance {
     }
   }
 
+  /// Generates the key based on [type] (and optionally a [name])
+  /// to register an Instance Builder in the hashmap.
   String _getKey(Type type, String name) {
     return name == null ? type.toString() : type.toString() + name;
   }
@@ -239,6 +270,20 @@ class GetInstance {
 
   /// Delete registered Class Instance [S] (or [tag]) and, closes any open
   /// controllers [DisposableInterface], cleans up the memory
+  ///
+  /// /// Deletes the Instance<[S]>, cleaning the memory.
+  //  ///
+  //  /// - [tag] Optional "tag" used to register the Instance
+  //  /// - [key] For internal usage, is the processed key used to register
+  //  ///   the Instance. **don't use** it unless you know what you are doing.
+
+  /// Deletes the Instance<[S]>, cleaning the memory and closes any open
+  /// controllers ([DisposableInterface]).
+  ///
+  /// - [tag] Optional "tag" used to register the Instance
+  /// - [key] For internal usage, is the processed key used to register
+  ///   the Instance. **don't use** it unless you know what you are doing.
+  /// - [force] Will delete an Instance even if marked as [permanent].
   Future<bool> delete<S>({String tag, String key, bool force = false}) async {
     final newKey = key ?? _getKey(S, tag);
 
@@ -248,11 +293,12 @@ class GetInstance {
         return false;
       }
 
-      _FcBuilder builder = _singl[newKey] as _FcBuilder;
+      final builder = _singl[newKey];
       if (builder.permanent && !force) {
         GetConfig.log(
-            '"$newKey" has been marked as permanent, SmartManagement is not authorized to delete it.',
-            isError: true);
+          '"$newKey" has been marked as permanent, SmartManagement is not authorized to delete it.',
+          isError: true,
+        );
         return false;
       }
       final i = builder.dependency;
@@ -276,19 +322,22 @@ class GetInstance {
     });
   }
 
-  /// Check if a Class instance [S] (or [tag]) is registered.
+  /// Check if a Class Instance<[S]> (or [tag]) is registered in memory.
+  /// - [tag] optional, if you use a [tag] to register the Instance.
   bool isRegistered<S>({String tag}) => _singl.containsKey(_getKey(S, tag));
 
-  /// Check if Class instance [S] (or [tag]) is prepared to be used.
+  /// Checks if a lazy factory callback that returns an Instance<[S]>
+  /// is registered.
+  /// - [tag] optional, if you use a [tag] to register the Instance.
   bool isPrepared<S>({String tag}) => _factory.containsKey(_getKey(S, tag));
 }
 
-typedef FcBuilderFunc<S> = S Function();
+typedef InstanceBuilderCallback<S> = S Function();
 
-typedef FcBuilderFuncAsync<S> = Future<S> Function();
+typedef AsyncInstanceBuilderCallback<S> = Future<S> Function();
 
 /// Internal class to register instances with Get.[put]<[S]>().
-class _FcBuilder<S> {
+class _InstanceBuilderFactory<S> {
   /// Marks the Builder as a single instance.
   /// For reusing [dependency] instead of [builderFunc]
   bool isSingleton;
@@ -298,7 +347,7 @@ class _FcBuilder<S> {
 
   /// Generates (and regenerates) the instance when [isSingleton]=false.
   /// Usually used by factory methods
-  FcBuilderFunc<S> builderFunc;
+  InstanceBuilderCallback<S> builderFunc;
 
   /// Flag to persist the instance in memory,
   /// without considering [GetConfig.smartManagement]
@@ -306,7 +355,8 @@ class _FcBuilder<S> {
 
   bool isInit = false;
 
-  _FcBuilder(this.isSingleton, this.builderFunc, this.permanent, this.isInit);
+  _InstanceBuilderFactory(
+      this.isSingleton, this.builderFunc, this.permanent, this.isInit);
 
   /// Gets the actual instance by it's [builderFunc] or the persisted instance.
   S getDependency() {
@@ -318,6 +368,6 @@ class _FcBuilder<S> {
 /// keeps a reference to the callback to be called.
 class _Lazy {
   bool fenix;
-  FcBuilderFunc builder;
+  InstanceBuilderCallback builder;
   _Lazy(this.builder, this.fenix);
 }

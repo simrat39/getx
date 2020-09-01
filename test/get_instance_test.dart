@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:matcher/matcher.dart';
 import 'package:get/get.dart';
+import 'util/matcher.dart';
 
 class Mock {
   static Future<String> test() async {

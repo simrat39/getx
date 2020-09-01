@@ -1,3 +1,19 @@
+## [3.6.3]
+- Fix onStart called null on tests
+
+## [3.6.2]
+- Fix more formatting issues
+
+## [3.6.1]
+- Fix formatting issues
+
+## [3.6.0]
+- Added RxSet
+- Change default logger to developer.log (@jorgegaticav)
+- Added BindingsBuilder, ValueBuilder, and ObxValue (@roipeker) 
+- Fix fallback locale not working if missing country code (@thaihuynhxyz)
+- Fix validation of email ".com.br"
+
 ## [3.5.1]
 - Remove unnecessary whitespaces
 

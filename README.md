@@ -4,7 +4,9 @@
 
 [![pub package](https://img.shields.io/pub/v/get.svg?label=get&color=blue)](https://pub.dev/packages/get)
 ![building](https://github.com/jonataslaw/get/workflows/build/badge.svg)
-[![Discord Shield](https://discordapp.com/api/guilds/722900883784073290/widget.png?style=shield)](https://discord.com/invite/9Hpt99N)
+[![Discord Shield](https://img.shields.io/discord/722900883784073290.svg?logo=discord)](https://discord.com/invite/9Hpt99N)
+[![Get on Slack](https://img.shields.io/badge/slack-join-orange.svg)](https://communityinviter.com/apps/getxworkspace/getx)
+[![Telegram](https://img.shields.io/badge/chat-on%20Telegram-blue.svg)](https://t.me/joinchat/PhdbJRmsZNpAqSLJL6bH7g)
 <a href="https://github.com/Solido/awesome-flutter">
    <img alt="Awesome Flutter" src="https://img.shields.io/badge/Awesome-Flutter-blue.svg?longCache=true&style=flat-square" />
 </a>
@@ -12,7 +14,6 @@
 
 ![](getx.png)
 
-- [Communication and support channels:](#communication-and-support-channels)
 - [About Get](#about-get)
 - [Installing](#installing)
 - [Counter App with GetX](#counter-app-with-getx)
@@ -36,23 +37,14 @@
 - [Why Getx?](#why-getx)
 
 
-# Communication and support channels:
-
-[**Slack (English)**](https://communityinviter.com/apps/getxworkspace/getx)
-
-[**Discord (English, Spanish and Portuguese)**](https://discord.com/invite/9Hpt99N)
-
-[**Telegram (Portuguese)**](https://t.me/joinchat/PhdbJRmsZNpAqSLJL6bH7g)
-
 # About Get
 
 - GetX is an extra-light and powerful solution for Flutter. It combines high performance state management, intelligent dependency injection, and route management in a quick and practical way.
 
-
 - GetX has 3 basic principles, this means that this is the priority for all resources in the library
-**PERFORMANCE:** GetX is focused on performance and minimum consumption of resources. Benchmarks are almost always not important in the real world, but if you want, there is a consumption indicator here([benchmarks](https://github.com/jonataslaw/benchmarks)), where GetX does better than other state management approaches, for example. The difference is not large, but it shows our concern not to waste its resources.
-**PRODUCTIVITY:** GetX uses an easy and pleasant syntax.
-**ORGANIZATION:** GetX allows total decoupling of the View from the business logic.
+  - **PERFORMANCE:** GetX is focused on performance and minimum consumption of resources. Benchmarks are almost always not important in the real world, but if you want, there is a consumption indicator here([benchmarks](https://github.com/jonataslaw/benchmarks)), where GetX does better than other state management approaches, for example. The difference is not large, but it shows our concern not to waste its resources.
+  - **PRODUCTIVITY:** GetX uses an easy and pleasant syntax.
+  - **ORGANIZATION:** GetX allows total decoupling of the View from the business logic.
 
 
 - GetX will save hours of development, and will extract the maximum performance that your application can deliver, being easy for beginners, and accurate for experts. Navigate without context, open dialogs, snackbars or bottomsheets from anywhere in your code, Manage states and inject dependencies in an easy and practical way. Get is secure, stable, up-to-date, and offers a huge range of APIs that are not present on default framework.
@@ -60,7 +52,15 @@
 
 - GetX is not a bloated. It has a multitude of features that allow you to start programming without worrying about anything, but each of these features are in separate containers, and are only started after use. If you only use State Management, only State Management will be compiled. If you only use routes, nothing from the state management will be compiled. You can compile the benchmark repository, and you will see that using only Get state management, the application compiled with Get has become smaller than all other applications that have only the state management of other packages, because nothing that is not used will be compiled into your code, and each GetX solution was designed to be extra lightweight. The merit here also comes from Flutter's tree shaking which is incredible, and manages to eliminate unused resources like no other framework does.
 
-**GetX makes your development productive, but want to make it even more productive? Add the extension [GetX extension to VSCode](https://marketplace.visualstudio.com/items?itemName=get-snippets.get-snippets) to your VSCode**
+**GetX makes your development productive, but want to make it even more productive? Add the extension [GetX extension to VSCode](https://marketplace.visualstudio.com/items?itemName=get-snippets.get-snippets)**
+
+**GetX Community channels:**
+
+GetX has a huge, highly active, and helpful community. If you have questions, or would like any assistance regarding the use of this framework, please join our community channels, your question will be answered more quickly, and it will be the most suitable place. This repository is exclusive for opening issues, and requesting resources, but feel free to be part of GetX Community.
+
+| **Slack** | **Discord** | **Telegram** |
+| --------- | ------------| ------------ |
+| [![Get on Slack](https://img.shields.io/badge/slack-join-orange.svg)](https://communityinviter.com/apps/getxworkspace/getx) | [![Discord Shield](https://img.shields.io/discord/722900883784073290.svg?logo=discord)](https://discord.com/invite/9Hpt99N) | [![Telegram](https://img.shields.io/badge/chat-on%20Telegram-blue.svg)](https://t.me/joinchat/PhdbJRmsZNpAqSLJL6bH7g) |
 
 # Installing
 
@@ -81,7 +81,7 @@ import 'package:get/get.dart';
 The "counter" project created by default on new project on Flutter has over 100 lines (with comments). To show the power of Get, I will demonstrate how to make a "counter" changing the state with each click, switching between pages and sharing the state between screens, all in an organized way, separating the business logic from the view, in ONLY 26 LINES CODE INCLUDING COMMENTS.
 
 - Step 1:
-Add "Get" before your materialApp, turning it into GetMaterialApp
+Add "Get" before your MaterialApp, turning it into GetMaterialApp
 
 ```dart
 void main() => runApp(GetMaterialApp(home: Home()));
@@ -97,7 +97,7 @@ You can make any variable observable using a simple ".obs".
 ```dart
 class Controller extends GetxController{
   var count = 0.obs;
-  increment() => count.value++;
+  increment() => count+1;
 }
 ```
 
@@ -113,7 +113,7 @@ class Home extends StatelessWidget {
   @override
   Widget build(context) => Scaffold(
       // Use Obx(()=> to update Text() whenever count is changed.
-      appBar: AppBar(title: Obx(() => Text("Clicks: " + c.count.string))),
+      appBar: AppBar(title: Obx(() => Text("Clicks: ${c.count}"))),
 
       // Replace the 8 lines Navigator.push by a simple Get.to(). You don't need context
       body: Center(child: RaisedButton(
@@ -129,7 +129,7 @@ class Other extends StatelessWidget {
   @override
   Widget build(context){
      // Access the updated count variable
-     return Scaffold(body: Center(child: Text(c.count.string)));
+     return Scaffold(body: Center(child: Text("${c.count}")));
   }
 }
 ```
@@ -184,7 +184,7 @@ var name = 'Jonatas Borges'.obs;
 And in the UI, when you want to show that value and update the screen whenever tha values changes, simply do this:
 
 ```dart
-Obx (() => Text (controller.name));
+Obx(() => Text("${controller.name}"));
 ```
 
 That's all. It's *that* simple.
@@ -496,6 +496,43 @@ void localLogWriter(String text, {bool isError = false}) {
   // you get check the flag if you want through GetConfig.isLogEnable
 }
 
+```
+
+### Local State Widgets
+
+These Widgets allows you to manage a single value, and keep the state ephemeral and locally.
+We have flavours for Reactive and Simple.
+For instance, you might use them to toggle obscureText in a TextField, maybe create a custom
+Expandable Panel, or maybe modify the current index in BottomNavigationBar while changing the content
+of the body in a Scaffold.
+
+#### ValueBuilder
+A simplification of StatefulWidget that works with a "setState" callback that takes the updated value.
+
+```dart
+ValueBuilder<bool>(
+  initialValue: false,
+  builder: (value, updateFn) => Switch(
+    value: value,
+    onChanged: updateFn, // same signature! you could use ( newValue ) => updateFn( newValue )
+  ),
+  // if you need to call something outside the builder method.
+  onUpdate: (value) => print("Value updated: $value"),
+  onDispose: () => print("Widget unmounted"),   
+),
+```
+
+#### ObxValue
+Similar to ValueBuilder, but this is the Reactive version, you pass a Rx instance (remember the magical .obs?) and 
+updates automatically... isn't it awesome?
+
+```dart
+ObxValue((data) => Switch(
+        value: data.value,
+        onChanged: data, // Rx has a _callable_ function! You could use (flag) => data.value = flag,
+    ),
+    false.obs,
+),
 ```
 
 ## Video explanation of Other GetX Features
