@@ -1,14 +1,18 @@
 ![](get.png)
 
-*Idiomas: Español (este archivo), [Inglés](README.md), [Portugués de Brasil](README.pt-br.md), [Polaco](README.pl.md).*
+*Idiomas: Español (este archivo), [Lengua china](README.zh-cn.md), [Inglés](README.md), [Portugués de Brasil](README.pt-br.md), [Polaco](README.pl.md).*
 
 [![pub package](https://img.shields.io/pub/v/get.svg?label=get&color=blue)](https://pub.dev/packages/get)
 ![building](https://github.com/jonataslaw/get/workflows/build/badge.svg)
-[![Gitter](https://badges.gitter.im/flutter_get/community.svg)](https://gitter.im/flutter_get/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![style: effective dart](https://img.shields.io/badge/style-effective_dart-40c4ff.svg)](https://pub.dev/packages/effective_dart)
+[![Discord Shield](https://img.shields.io/discord/722900883784073290.svg?logo=discord)](https://discord.com/invite/9Hpt99N)
+[![Get on Slack](https://img.shields.io/badge/slack-join-orange.svg)](https://communityinviter.com/apps/getxworkspace/getx)
+[![Telegram](https://img.shields.io/badge/chat-on%20Telegram-blue.svg)](https://t.me/joinchat/PhdbJRmsZNpAqSLJL6bH7g)
 <a href="https://github.com/Solido/awesome-flutter">
-<img alt="Awesome Flutter" src="https://img.shields.io/badge/Awesome-Flutter-blue.svg?longCache=true&style=flat-square" />
+   <img alt="Awesome Flutter" src="https://img.shields.io/badge/Awesome-Flutter-blue.svg?longCache=true&style=flat-square" />
 </a>
 <a href="https://www.buymeacoffee.com/jonataslaw" target="_blank"><img src="https://i.imgur.com/aV6DDA7.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important; box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" > </a>
+
 ![](getx.png)
 
 <h3>Lamentamos la inconsistencia en la traducción. El paquete GetX se actualiza con bastante frecuencia y es posible que las traducciones a documentos no sean tan rápidas. Entonces, para que esta documentación aún tenga todo el contenido, dejaré aquí todos los textos nuevos sin traducir (considero que es mejor tener los documentos en inglés que no tenerlos), por lo que si alguien quiere traducir, sería de gran ayuda 😁</h3>
@@ -90,7 +94,7 @@ import 'package:get/get.dart';
 
 # Proyecto Counter no GetX
 
-Vea una explicación más detallada de la administración del estado [aquí](./docs/es_ES/state_management.md). Allí verá más ejemplos y también la diferencia entre el Gestión del Estado simple y el Gestión del Estado reactivo
+Vea una explicación más detallada de la administración del estado [aquí](./documentation/es_ES/state_management.md). Allí verá más ejemplos y también la diferencia entre el Gestión del Estado simple y el Gestión del Estado reactivo
 
 El proyecto "contador" creado por defecto en un nuevo proyecto en Flutter tiene más de 100 líneas (con comentarios). Para mostrar el poder de GetX, demostraré cómo hacer un "contador" cambiando el estado con cada clic, cambiando de página y compartiendo el estado entre pantallas, todo de manera organizada, separando la vista de la lógica de negocio, SOLO 26 LÍNEAS DE CÓDIGO INCLUIDOS COMENTARIOS.
 
@@ -191,7 +195,7 @@ Obx(() => Text (controller.name));
 
 ### Más detalles sobre la gestión del estado.
 
-**Vea una explicación más detallada de la administración del estado [aquí](./docs/es_ES/state_management.md). Allí verá más ejemplos y también la diferencia entre el Gestión del Estado simple y el Gestión del Estado reactivo**
+**Vea una explicación más detallada de la administración del estado [aquí](./documentation/es_ES/state_management.md). Allí verá más ejemplos y también la diferencia entre el Gestión del Estado simple y el Gestión del Estado reactivo**
 
 ### Explicación en video sobre state management
 
@@ -233,7 +237,7 @@ var data = await Get.to(Payment());
 
 ### Más detalles sobre la gestión de rutas.
 
-**Vea una explicación más detallada de la Gestión de Rutas [aquí](./docs/es_ES/route_management.md).**
+**Vea una explicación más detallada de la Gestión de Rutas [aquí](./documentation/es_ES/route_management.md).**
 
 ### Explicación del video
 
@@ -277,7 +281,7 @@ Get.lazyPut<Service>(()=> ApiMock());
 
 ### Más detalles sobre la gestión de dependencias.
 
-**Vea una explicación más detallada de la Gestión de dependencias [aquí](./docs/es_ES/dependency_management.md).**
+**Vea una explicación más detallada de la Gestión de dependencias [aquí](./documentation/es_ES/dependency_management.md).**
 
 # Utilidades
 
@@ -514,7 +518,7 @@ Ahora:
 ```dart
 GetMaterialApp(
   getPages: [
-    GetPage(name: '/', page:()=> Home()),
+    GetPage(name: '/', page: () => Home()),
   ]
 )
 ```
